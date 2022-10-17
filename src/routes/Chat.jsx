@@ -1,15 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { chatAction } from '../store/actions';
+import { apiConstants } from "../store/constants/api.constants";
+import { useParams } from 'react-router-dom';
 
-export default function Chat() {
+export default function Chat(props) {
+  const dispatch = useDispatch();
+  const params = useParams();
+  console.log(params, '@@@@@@@@@@@@@@@@@')
   const chatWindow = useRef(null);
   const [input, setInput] = useState("");
-  const [chatData, setChatData] = useState([
-    {
-      user: "some user",
-      message: "Somewhere stored deep, deep in my memory banks is the phrase It really whips the llama's ass.",
-      userType: "sender"
-    }
-  ])
+
+  const userId = useSelector(state => state.appReducer.id)
+  const messages = useSelector(state => state.messages.messages);
 
   const chatInputHandler = (e) => {
     setInput(e.target.value)
@@ -22,7 +25,7 @@ export default function Chat() {
       message: input,
       sender: true
     }
-    setChatData(chatData => [...chatData, data]);
+    // setChatData(chatData => [...chatData, data]);
     setInput("")
   }
 
@@ -35,19 +38,24 @@ export default function Chat() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [chatData])
+  }, [messages])
+
+  useEffect(() => {
+    dispatch(chatAction.getMessageById(apiConstants.GetChat, { chatId: params.id }))
+  }, [])
 
   return (
     <div id="detail">
       <div className="--dark-theme" id="chat">
         <div className="chat__conversation-board" ref={chatWindow}>
-          {chatData.map((chat, idx) => (
-            <div key={idx} className={`${chat.sender ? `chat__conversation-board__message-container reversed` : `chat__conversation-board__message-container`}`}>
+          {messages.map(chat => (
+            <div key={chat._id} className={`${userId !== chat.sender._id ? `chat__conversation-board__message-container` : `chat__conversation-board__message-container reversed`}`}>
+              {/* {console.log(, "chat sender")} */}
               <div className="chat__conversation-board__message__person">
                 <div className="chat__conversation-board__message__person__avatar"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Monika Figi" /></div><span className="chat__conversation-board__message__person__nickname">Monika Figi</span>
               </div>
               <div className="chat__conversation-board__message__context">
-                <div className="chat__conversation-board__message__bubble"> <span>{chat.message}</span></div>
+                <div className="chat__conversation-board__message__bubble"> <span>{chat.content}</span></div>
               </div>
               <div className="chat__conversation-board__message__options">
                 <button className="btn-icon chat__conversation-board__message__option-button option-item emoji-button">

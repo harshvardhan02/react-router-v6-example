@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { Outlet, useLoaderData, Form, redirect, NavLink, useNavigation, useSubmit } from "react-router-dom";
 import { getContacts, createContact } from "../contacts";
+import { useSelector, useDispatch } from 'react-redux';
+import { chatAction } from '../store/actions';
+import { apiConstants } from "../store/constants/api.constants";
 
 export async function loader({ request }) {
   const url = new URL(request.url);
@@ -15,9 +18,16 @@ export async function action() {
 }
 
 export default function Root() {
+  const dispatch = useDispatch();
   const { contacts, q } = useLoaderData();
   const navigation = useNavigation();
   const submit = useSubmit();
+
+  const id = useSelector(state => state.appReducer.id)
+  const groups = useSelector(state => state.groupChat.groups)
+  console.log(groups, '<---------')
+
+  const appName = useSelector(state => state.appReducer.name)
 
   const searching =
     navigation.location &&
@@ -26,15 +36,19 @@ export default function Root() {
     );
 
   useEffect(() => {
-    // document.getElementById("q").value = q;
+    document.getElementById("q").value = q;
   }, [q]);
+
+  useEffect(() => {
+    dispatch(chatAction.getGroupChat(apiConstants.GetChat, { id: id }))
+  }, [])
 
   return (
     <>
       <div id="sidebar">
-        <h1>React Router Contacts</h1>
+        <h1>{appName}</h1>
         <div>
-          {/* <Form id="search-form" role="search">
+          <Form id="search-form" role="search">
             <input
               id="q"
               className={searching ? "loading" : ""}
@@ -62,15 +76,15 @@ export default function Root() {
           </Form>
           <Form method="post">
             <button type="submit">New</button>
-          </Form> */}
+          </Form>
         </div>
         <nav>
-          {contacts.length ? (
+          {groups.length ? (
             <ul>
-              {contacts.map((contact) => (
-                <li key={contact.id}>
+              {groups.map((group) => (
+                <li key={group.id}>
                   <NavLink
-                    to={`contacts/${contact.id}`}
+                    to={`chat/${group._id}`}
                     className={({ isActive, isPending }) =>
                       isActive
                         ? "active"
@@ -79,24 +93,21 @@ export default function Root() {
                           : ""
                     }
                   >
-                    {contact.first || contact.last ? (
+                    {group.chatName ? (
                       <>
-                        {contact.first} {contact.last}
+                        {group.chatName}
                       </>
                     ) : (
                       <i>No Name</i>
                     )}{" "}
-                    {contact.favorite && <span>★</span>}
+                    {group.isGroupChat && <span>★</span>}
                   </NavLink>
                 </li>
 
               ))}
               <li>
-                {/* <NavLink to={`settings`}>
+                <NavLink to={`settings`}>
                   Settings
-                </NavLink> */}
-                <NavLink to={`chat`}>
-                  Chat
                 </NavLink>
               </li>
             </ul>
@@ -108,6 +119,7 @@ export default function Root() {
         </nav>
       </div>
       <div
+        id="detail"
         className={
           navigation.state === "loading" ? "loading" : ""
         }

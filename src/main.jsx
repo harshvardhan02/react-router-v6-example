@@ -15,7 +15,11 @@ import Index from "./routes/index";
 import Settings from "./routes/settings";
 import General from "./routes/general";
 import Profile from "./routes/profile";
-import Chat from "./routes/Chat";
+
+import Chat from './routes/Chat';
+
+import { Provider } from 'react-redux';
+import store from './store';
 
 
 const router = createBrowserRouter([
@@ -61,6 +65,16 @@ const router = createBrowserRouter([
       {
         path: "chat",
         element: <Chat />,
+        children: [
+          {
+            path: ":id",
+            element: <General />,
+          },
+          {
+            path: "profile",
+            element: <Profile />,
+          }
+        ]
       }
     ],
   }
@@ -68,6 +82,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>
 );
