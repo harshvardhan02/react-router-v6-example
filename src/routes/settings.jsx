@@ -3,7 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 export default function Settings() {
   return (
-    <>
+    <div>
       <div id='settingMenu'>
         <div>
           settings
@@ -28,10 +28,9 @@ export default function Settings() {
           </ul>
         </nav>
       </div>
-      <div
-        id="detail">
+      <div>
         <Outlet />
       </div>
-    </>
+    </div>
   )
 }

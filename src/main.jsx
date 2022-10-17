@@ -15,6 +15,7 @@ import Index from "./routes/index";
 import Settings from "./routes/settings";
 import General from "./routes/general";
 import Profile from "./routes/profile";
+import Chat from "./routes/Chat";
 
 
 const router = createBrowserRouter([
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
             element: <Profile />,
           }
         ]
+      },
+      {
+        path: "chat",
+        element: <Chat />,
       }
     ],
   }

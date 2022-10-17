@@ -26,7 +26,7 @@ export default function Root() {
     );
 
   useEffect(() => {
-    document.getElementById("q").value = q;
+    // document.getElementById("q").value = q;
   }, [q]);
 
   return (
@@ -34,7 +34,7 @@ export default function Root() {
       <div id="sidebar">
         <h1>React Router Contacts</h1>
         <div>
-          <Form id="search-form" role="search">
+          {/* <Form id="search-form" role="search">
             <input
               id="q"
               className={searching ? "loading" : ""}
@@ -62,7 +62,7 @@ export default function Root() {
           </Form>
           <Form method="post">
             <button type="submit">New</button>
-          </Form>
+          </Form> */}
         </div>
         <nav>
           {contacts.length ? (
@@ -92,8 +92,11 @@ export default function Root() {
 
               ))}
               <li>
-                <NavLink to={`settings`}>
+                {/* <NavLink to={`settings`}>
                   Settings
+                </NavLink> */}
+                <NavLink to={`chat`}>
+                  Chat
                 </NavLink>
               </li>
             </ul>
@@ -105,7 +108,6 @@ export default function Root() {
         </nav>
       </div>
       <div
-        id="detail"
         className={
           navigation.state === "loading" ? "loading" : ""
         }
