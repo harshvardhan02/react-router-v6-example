@@ -3,30 +3,48 @@ import { useSelector, useDispatch } from 'react-redux';
 import { chatAction } from '../store/actions';
 import { apiConstants } from "../store/constants/api.constants";
 import { useParams } from 'react-router-dom';
+import { io } from 'socket.io-client';
 
 export default function Chat(props) {
   const dispatch = useDispatch();
   const params = useParams();
-  console.log(params, '@@@@@@@@@@@@@@@@@')
   const chatWindow = useRef(null);
   const [input, setInput] = useState("");
+  // const [socket, setSocket] = useState(null);
+  const [connected, setConneted] = useState(false)
+  const [typing, setTyping] = useState(false)
 
-  const userId = useSelector(state => state.appReducer.id)
+  // const userId = useSelector(state => state.appReducer.id)
+  const userId = localStorage.getItem("userId");
   const messages = useSelector(state => state.messages.messages);
+  const chatIdData = useSelector(state => state.chatById.chatByIdData);
+
+  const socket = io(`http://localhost:2001`);
+  socket.emit("join room", userId);
+  socket.on("connected", () => setConneted(true));
 
   const chatInputHandler = (e) => {
     setInput(e.target.value)
   }
 
+  const addChatMessageHtml = () => {
+    // if (connected) {
+    socket.emit("new message", chatIdData)
+    // }
+  }
+
   const submitChat = (e) => {
     e.preventDefault();
     const data = {
-      user: "some user",
-      message: input,
-      sender: true
+      content: input,
+      chatId: params.id,
+      userId: userId
     }
     // setChatData(chatData => [...chatData, data]);
+    dispatch(chatAction.createMessage(apiConstants.CreateMessage, data))
     setInput("")
+    // window.location.reload();
+    addChatMessageHtml();
   }
 
   const scrollToBottom = () => {
@@ -42,17 +60,36 @@ export default function Chat(props) {
 
   useEffect(() => {
     dispatch(chatAction.getMessageById(apiConstants.GetChat, { chatId: params.id }))
+    // dispatch(chatAction.getChatById(apiConstants.GetChat, { chatId: params.id, userId: userId }))
+    addChatMessageHtml();
+  }, [])
+
+  useEffect(() => {
+    const socket = io(`http://localhost:2001`);
+    socket.emit("join room", userId);
+    socket.emit("typing", userId)
+    // socket.on("typing", () => input ? setTyping(true) : null)
+    setConneted(socket)
+    // setSocket(socket)
+    // return () => socket.close();
   }, [])
 
   return (
-    <div id="detail">
+    <div id="detail-chat">
       <div className="--dark-theme" id="chat">
         <div className="chat__conversation-board" ref={chatWindow}>
           {messages.map(chat => (
             <div key={chat._id} className={`${userId !== chat.sender._id ? `chat__conversation-board__message-container` : `chat__conversation-board__message-container reversed`}`}>
               {/* {console.log(, "chat sender")} */}
               <div className="chat__conversation-board__message__person">
-                <div className="chat__conversation-board__message__person__avatar"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Monika Figi" /></div><span className="chat__conversation-board__message__person__nickname">Monika Figi</span>
+                <div className="chat__conversation-board__message__person__avatar">
+                  <span style={{ width: '50px', height: '50px', color: '#fff' }}>
+                    {chat.sender.firstname.substring(0, 1)}
+                    {chat.sender.lastname.substring(0, 1)}
+                  </span>
+                  {/* <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Monika Figi" /> */}
+                </div>
+                <span className="chat__conversation-board__message__person__nickname">Monika Figi</span>
               </div>
               <div className="chat__conversation-board__message__context">
                 <div className="chat__conversation-board__message__bubble"> <span>{chat.content}</span></div>
@@ -96,7 +133,7 @@ export default function Chat(props) {
               </button>
               <input
                 className="chat__conversation-panel__input panel-item"
-                placeholder="Type a message..."
+                placeholder={typing ? "Typing" : "Type a message..."}
                 onChange={(e) => chatInputHandler(e)}
                 value={input}
               />

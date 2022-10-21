@@ -13,4 +13,6 @@ export const apiConstants = {
 
   GetChat: '/get-chat',
   UpdateChatById: '/update-chat',
+
+  Login: '/login'
 }

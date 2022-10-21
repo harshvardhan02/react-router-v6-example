@@ -20,12 +20,14 @@ import Chat from './routes/Chat';
 
 import { Provider } from 'react-redux';
 import store from './store';
+import Login from "./routes/Login";
 
+const isAuthenticated = !!localStorage.getItem("token");
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root />,
+    element: isAuthenticated ? <Root /> : <Login />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
     action: rootAction,
@@ -75,8 +77,12 @@ const router = createBrowserRouter([
             element: <Profile />,
           }
         ]
-      }
+      },
     ],
+  },
+  {
+    path: "login",
+    element: <Login />
   }
 ]);
 

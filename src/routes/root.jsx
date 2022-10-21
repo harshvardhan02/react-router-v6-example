@@ -23,9 +23,8 @@ export default function Root() {
   const navigation = useNavigation();
   const submit = useSubmit();
 
-  const id = useSelector(state => state.appReducer.id)
-  const groups = useSelector(state => state.groupChat.groups)
-  console.log(groups, '<---------')
+  const id = localStorage.getItem("userId");
+  const groups = useSelector(state => state.groupChat.groups);
 
   const appName = useSelector(state => state.appReducer.name)
 
@@ -82,7 +81,7 @@ export default function Root() {
           {groups.length ? (
             <ul>
               {groups.map((group) => (
-                <li key={group.id}>
+                <li key={group._id}>
                   <NavLink
                     to={`chat/${group._id}`}
                     className={({ isActive, isPending }) =>

@@ -15,7 +15,8 @@ export const commonService = {
   handleResponse,
   withOutTokenAndBaseUrl,
   getDataWithTokenAndBaseUrl,
-  getMessageById
+  getMessageById,
+  getChatById
 };
 
 //-- It's common function for using the token
@@ -38,6 +39,18 @@ async function getMessageById(apiName, userData) {
   const response = await axios.request({
     method: 'GET',
     url: `${config.apiUrl + apiName}/${userData.chatId}/messages`,
+    // headers: { 'Content-Type': 'application/json', 'access_token': token },
+    // params: userData
+  });
+  return handleResponse(response);
+}
+
+async function getChatById(apiName, userData) {
+  console.log(userData)
+  // let token = JSON.parse(sessionStorage.getItem('token'));
+  const response = await axios.request({
+    method: 'GET',
+    url: `${config.apiUrl + apiName}/${userData.chatId}/${userData.userId}`,
     // headers: { 'Content-Type': 'application/json', 'access_token': token },
     // params: userData
   });
